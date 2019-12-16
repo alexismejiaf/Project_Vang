@@ -7,6 +7,7 @@ import WelcomeBoard from '../WelcomeBoard/WelcomeBoard'
 import './Main.css'
 import ChatBoard from './../ChatBoard/ChatBoard'
 import {AppString} from './../Const'
+import Web3 from 'web3'
 
 class Main extends Component {
     constructor(props) {
@@ -15,7 +16,8 @@ class Main extends Component {
             isLoading: true,
             isOpenDialogConfirmLogout: false,
             currentPeerUser: null,
-            progressbar: null
+            progressbar: null,
+            account:''
         }
         this.currentUserId = localStorage.getItem(AppString.ID)
         this.currentUserAvatar = localStorage.getItem(AppString.PHOTO_URL)
@@ -23,8 +25,18 @@ class Main extends Component {
         this.listUser = []
     }
 
+    async loadBlockchainData() {
+        const web3 = new Web3(Web3.givenProvider || "http://localhost:8545")
+        const network = await web3.eth.net.getNetworkType()
+        const accounts = await web3.eth.getAccounts()
+        console.log("Account", accounts[0])
+    }
+
     componentDidMount() {
         this.checkLogin()
+    }
+    componentWillMount(){
+        this.loadBlockchainData()
     }
 
     checkLogin = () => {
