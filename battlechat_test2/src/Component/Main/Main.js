@@ -18,13 +18,17 @@ class Main extends Component {
             isOpenDialogConfirmLogout: false,
             currentPeerUser: null,
             progressbar: null,
-            account:'',
-            vidaCount: 0
+            account:'Cristo',
+            vidaCount: 0,
+            Vidas: [],
+            loading: true
+
         }
         this.currentUserId = localStorage.getItem(AppString.ID)
         this.currentUserAvatar = localStorage.getItem(AppString.PHOTO_URL)
         this.currentUserNickname = localStorage.getItem(AppString.NICKNAME)
         this.listUser = []
+        this.crearVida=this.crearVida.bind(this)
     }
 
     async loadBlockchainData() {
@@ -35,6 +39,20 @@ class Main extends Component {
         this.setState({vidas})
         const vidaCount = await vidas.methods.vidaCount().call()
         this.setState({vidaCount: vidaCount})
+        for(var i=1; i<=vidaCount; i++){
+            const vida=await vidas.methods.vidas(i).call()
+            this.setState({
+                Vidas:[...this.state.Vidas, vida]
+            })
+        }
+        console.log("Vidas", this.state.Vidas)
+        this.setState({loading: false})
+    }
+    crearVida(){
+        this.setState({loading: true})
+        this.state.vidas.methods.crearVida('yolo',100).send({from: this.state.account}).once('receipt',(receipt) => {
+            this.setState({loading: false})
+        })
     }
 
     componentDidMount() {
@@ -143,6 +161,7 @@ class Main extends Component {
                 {/* Header */}
                 <div className="header">
                     <span>MAIN</span>
+                    <button onClick={this.crearVida}/>
                     <img
                         className="icProfile"
                         alt="An icon default avatar"
